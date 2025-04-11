@@ -20,9 +20,9 @@ export default function Navbar() {
   const { user, signOut } = useAuth()
 
   const navItems = [
-    // { name: "Home", href: "/" },
-    // { name: "About", href: "/about" },
-    // { name: "How It Works", href: "/#how-it-works" },
+    { name: "Home", href: "/" },
+    { name: "How It Works", href: "/#how-it-works" },
+    { name: "Dashboard", href: "/dashboard" }, 
   ]
 
   const isActive = (path: string) => {
@@ -39,7 +39,7 @@ export default function Navbar() {
             <span className="text-xl font-bold text-blue-600">TrustIt AI</span>
           </Link>
 
-          {/* Desktop Navigation 
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             {navItems.map((item) => (
               <Link
@@ -52,7 +52,7 @@ export default function Navbar() {
                 {item.name}
               </Link>
             ))}
-          </nav>*/}
+          </nav>
 
           {/* Auth Buttons (Desktop) */}
           <div className="hidden md:flex items-center space-x-4">
@@ -105,7 +105,6 @@ export default function Navbar() {
         <div className="md:hidden bg-white border-t">
           <div className="container mx-auto px-4 py-3">
             <nav className="flex flex-col space-y-3">
-              {/*
               {navItems.map((item) => (
                 <Link
                   key={item.name}
@@ -116,7 +115,6 @@ export default function Navbar() {
                   {item.name}
                 </Link>
               ))}
-              */}
               {user ? (
                 <>
                   <Link

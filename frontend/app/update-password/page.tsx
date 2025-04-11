@@ -2,26 +2,40 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { useAuth } from "@/hooks/use-auth"
+import { supabase } from "@/lib/supabase/client"
 
-export default function SignupPage() {
-  const [email, setEmail] = useState("")
+export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
-  const { signUp } = useAuth()
 
-  const handleSignup = async (e: React.FormEvent) => {
+  useEffect(() => {
+    // Check if we have a session
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession()
+      if (!data.session) {
+        toast({
+          title: "Session expired",
+          description: "Your password reset link has expired. Please request a new one.",
+          variant: "destructive",
+        })
+        router.push("/reset-password")
+      }
+    }
+
+    checkSession()
+  }, [router, toast])
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (password !== confirmPassword) {
@@ -36,16 +50,20 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
-      await signUp(email, password)
+      const { error } = await supabase.auth.updateUser({ password })
+
+      if (error) throw error
+
       toast({
-        title: "Account created",
-        description: "You have successfully signed up. Please check your email for verification.",
+        title: "Password updated",
+        description: "Your password has been successfully updated",
       })
-      router.push("/dashboard")
+
+      router.push("/login")
     } catch (error: any) {
       toast({
-        title: "Sign up failed",
-        description: error.message || "There was an error creating your account",
+        title: "Update failed",
+        description: error.message || "There was an error updating your password",
         variant: "destructive",
       })
     } finally {
@@ -57,24 +75,13 @@ export default function SignupPage() {
     <div className="container mx-auto flex items-center justify-center min-h-[calc(100vh-4rem)] py-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-          <CardDescription>Enter your email and password to create your account</CardDescription>
+          <CardTitle className="text-2xl font-bold">Update password</CardTitle>
+          <CardDescription>Enter your new password</CardDescription>
         </CardHeader>
-        <form onSubmit={handleSignup}>
+        <form onSubmit={handleUpdatePassword}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">New Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -84,7 +91,7 @@ export default function SignupPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -94,16 +101,10 @@ export default function SignupPage() {
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
+          <CardFooter>
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Sign up"}
+              {isLoading ? "Updating..." : "Update password"}
             </Button>
-            <div className="text-center text-sm">
-              Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 hover:underline">
-                Sign in
-              </Link>
-            </div>
           </CardFooter>
         </form>
       </Card>

@@ -7,55 +7,19 @@ import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
-
-// Mock data for the analysis result
-const mockAnalysisResult = {
-  content: "Breaking news: Scientists discover that drinking coffee can cure cancer according to a new study.",
-  overallScore: 85, // Higher score means higher likelihood of misinformation (0-100)
-  agents: {
-    linguistic: {
-      score: 90,
-      findings: [
-        "Uses sensationalist language ('Breaking news')",
-        "Makes absolute claims ('can cure cancer')",
-        "Lacks specific details about the study",
-        "Uses emotional language to engage readers",
-      ],
-    },
-    factChecking: {
-      score: 80,
-      findings: [
-        "No specific study cited or referenced",
-        "No medical journal mentioned",
-        "Contradicts established medical consensus",
-        "Similar claims have been debunked by medical authorities",
-      ],
-    },
-    sentiment: {
-      score: 75,
-      findings: [
-        "Content designed to elicit hope in vulnerable populations",
-        "Uses emotional manipulation techniques",
-        "Creates false sense of breakthrough",
-      ],
-    },
-    sources: {
-      score: 95,
-      findings: [
-        "No credible sources cited",
-        "No expert quotes or references",
-        "No links to original research",
-        "Cannot be verified by external sources",
-      ],
-    },
-  },
-}
+import { supabase } from "@/lib/supabase/client"
+import { BookmarkIcon, BookmarkFilledIcon } from "@radix-ui/react-icons"
+import { toggleSaveAnalysis } from "@/lib/supabase/database"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function ResultsPage({ params }: { params: { id: string } }) {
   const [analysisResult, setAnalysisResult] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isSaved, setIsSaved] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
   const { user, loading } = useAuth()
   const router = useRouter()
+  const { toast } = useToast()
 
   useEffect(() => {
     if (!loading && !user) {
@@ -63,43 +27,66 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
       return
     }
 
-    // In a real implementation, this would fetch the analysis result from your backend
-    // const fetchAnalysisResult = async () => {
-    //   try {
-    //     const response = await fetch(`/api/analysis/${params.id}`)
-    //     const data = await response.json()
-    //     setAnalysisResult(data)
-    //   } catch (error) {
-    //     console.error('Error fetching analysis result:', error)
-    //   } finally {
-    //     setIsLoading(false)
-    //   }
-    // }
-
-    // Replace the mock data fetching with a real API call
-
-    // Change this:
-    // Simulate API call with timeout and mock data
     const fetchAnalysisResult = async () => {
-      try {
-        const response = await fetch(`https://your-fastapi-backend.com/api/analysis/${params.id}`)
+      if (!user) return
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch analysis result")
+      try {
+        const { data, error } = await supabase.from("analyses").select("*").eq("id", params.id).single()
+
+        if (error) throw error
+
+        // Check if this analysis belongs to the current user
+        if (data.user_id !== user.id) {
+          toast({
+            title: "Access denied",
+            description: "You don't have permission to view this analysis",
+            variant: "destructive",
+          })
+          router.push("/dashboard")
+          return
         }
 
-        const data = await response.json()
         setAnalysisResult(data)
+        setIsSaved(data.saved)
       } catch (error) {
         console.error("Error fetching analysis result:", error)
-        // Handle error state here
+        toast({
+          title: "Error",
+          description: "Failed to load analysis result",
+          variant: "destructive",
+        })
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchAnalysisResult()
-  }, [params.id, user, loading, router])
+    if (user) {
+      fetchAnalysisResult()
+    }
+  }, [params.id, user, loading, router, toast])
+
+  const handleToggleSave = async () => {
+    if (!user || !analysisResult) return
+
+    setIsSaving(true)
+
+    try {
+      await toggleSaveAnalysis(analysisResult.id, !isSaved)
+      setIsSaved(!isSaved)
+      toast({
+        title: isSaved ? "Removed from saved" : "Saved successfully",
+        description: isSaved ? "Analysis removed from your saved items" : "Analysis added to your saved items",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update saved status",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   if (loading || !user) {
     return (
@@ -147,12 +134,18 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
     return { level: "Low Risk", color: "bg-green-500" }
   }
 
-  const risk = getRiskLevel(analysisResult.overallScore)
+  const risk = getRiskLevel(analysisResult.result.overallScore)
 
   return (
     <div className="container mx-auto py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Analysis Results</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Analysis Results</h1>
+          <Button variant="outline" size="icon" onClick={handleToggleSave} disabled={isSaving}>
+            {isSaved ? <BookmarkFilledIcon className="h-5 w-5 text-blue-600" /> : <BookmarkIcon className="h-5 w-5" />}
+            <span className="sr-only">{isSaved ? "Unsave" : "Save"}</span>
+          </Button>
+        </div>
 
         <Card className="mb-8">
           <CardHeader>
@@ -177,7 +170,7 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
                 <div
                   className={`w-16 h-16 rounded-full flex items-center justify-center ${risk.color} text-white font-bold text-xl`}
                 >
-                  {analysisResult.overallScore}%
+                  {analysisResult.result.overallScore}%
                 </div>
               </div>
               <div>
@@ -187,7 +180,7 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
                 </p>
               </div>
             </div>
-            <Progress value={analysisResult.overallScore} className="h-2" />
+            <Progress value={analysisResult.result.overallScore} className="h-2" />
           </CardContent>
         </Card>
 
@@ -205,7 +198,7 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
                 <TabsTrigger value="sources">Sources</TabsTrigger>
               </TabsList>
 
-              {Object.entries(analysisResult.agents).map(([key, agent]: [string, any]) => (
+              {Object.entries(analysisResult.result.agents).map(([key, agent]: [string, any]) => (
                 <TabsContent key={key} value={key}>
                   <div className="space-y-4">
                     <div className="flex items-center">

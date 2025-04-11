@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/hooks/use-auth"
+import { supabase } from "@/lib/supabase/client"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,25 +31,66 @@ export default function SettingsPage() {
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login")
+      return
     }
+
+    // Fetch user settings from Supabase
+    const fetchUserSettings = async () => {
+      if (!user) return
+
+      try {
+        const { data, error } = await supabase
+          .from("user_settings")
+          .select("overlay_enabled")
+          .eq("user_id", user.id)
+          .single()
+
+        if (error && error.code !== "PGRST116") {
+          // PGRST116 is "no rows returned" error
+          throw error
+        }
+
+        if (data) {
+          setOverlayEnabled(data.overlay_enabled)
+        }
+      } catch (error) {
+        console.error("Error fetching user settings:", error)
+      }
+    }
+
+    fetchUserSettings()
   }, [user, loading, router])
 
   const handleOverlayToggle = async () => {
+    if (!user) return
+
     setIsLoading(true)
 
     try {
-      // In a real implementation, this would update the user's settings in Firebase
-      // await updateUserSettings(user.uid, { overlayEnabled: !overlayEnabled })
+      const newValue = !overlayEnabled
 
-      // Simulate API call with timeout
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      // Check if settings exist
+      const { data: existingSettings } = await supabase
+        .from("user_settings")
+        .select("id")
+        .eq("user_id", user.id)
+        .single()
 
-      setOverlayEnabled(!overlayEnabled)
+      if (existingSettings) {
+        // Update existing settings
+        await supabase.from("user_settings").update({ overlay_enabled: newValue }).eq("user_id", user.id)
+      } else {
+        // Insert new settings
+        await supabase.from("user_settings").insert({ user_id: user.id, overlay_enabled: newValue })
+      }
+
+      setOverlayEnabled(newValue)
       toast({
-        title: `Website overlay ${!overlayEnabled ? "enabled" : "disabled"}`,
-        description: `You have ${!overlayEnabled ? "enabled" : "disabled"} the website overlay feature.`,
+        title: `Website overlay ${newValue ? "enabled" : "disabled"}`,
+        description: `You have ${newValue ? "enabled" : "disabled"} the website overlay feature.`,
       })
     } catch (error) {
+      console.error("Error updating settings:", error)
       toast({
         title: "Failed to update settings",
         description: "There was an error updating your settings. Please try again.",
