@@ -11,7 +11,26 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "TrustIt AI - Misinformation Detector",
   description: "AI-powered tool to identify and analyze potential misinformation",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+    shortcut: '/favicon.ico',
+    other: [
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '16x16',
+        url: '/favicon-16x16.png',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '32x32',
+        url: '/favicon-32x32.png',
+      },
+    ],
+  }
 }
 
 export default function RootLayout({
