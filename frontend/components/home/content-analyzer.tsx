@@ -109,20 +109,22 @@ export default function ContentAnalyzer() {
             </TabsContent>
 
             <TabsContent value="image">
-              <ImageUploader />
+              <ImageUploader key={activeTab} />
             </TabsContent>
           </Tabs>
         </CardContent>
 
-        <CardFooter>
-          <Button
-            onClick={activeTab === "text" ? handleAnalyzeText : undefined}
-            disabled={isAnalyzing || (activeTab === "text" && !text.trim())}
-            className="w-full"
-          >
-            {isAnalyzing ? "Analyzing..." : "Analyze"}
-          </Button>
-        </CardFooter>
+        {activeTab === "text" && (
+          <CardFooter>
+            <Button
+              onClick={handleAnalyzeText}
+              disabled={isAnalyzing || !text.trim()}
+              className="w-full"
+            >
+              {isAnalyzing ? "Analyzing..." : "Analyze"}
+            </Button>
+          </CardFooter>
+        )}
       </Card>
     </section>
   )

@@ -135,10 +135,17 @@ export default function ImageUploader() {
             </button>
           </div>
         ) : (
-          <div className="py-8">
-            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-2" />
-            <p className="text-gray-600 mb-2">Drag and drop an image here, or click to select</p>
-            <p className="text-gray-400 text-sm">Supported formats: JPG, PNG, GIF</p>
+          <div className="py-8 flex flex-col items-center space-y-2">
+            <Upload className="h-12 w-12 text-gray-400" />
+            <p className="text-gray-600">Drag and drop an image here</p>
+            <p className="text-gray-500 text-sm">or</p>
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Click to select file
+            </Button>
+            <p className="text-gray-400 text-sm mt-2">Supported formats: JPG, PNG, GIF</p>
           </div>
         )}
         <input
@@ -146,7 +153,8 @@ export default function ImageUploader() {
           ref={fileInputRef}
           onChange={handleImageChange}
           accept="image/*"
-          className={preview ? "hidden" : "absolute inset-0 w-full h-full opacity-0 cursor-pointer"}
+          className="hidden"
+          aria-hidden="true"
         />
       </div>
 
