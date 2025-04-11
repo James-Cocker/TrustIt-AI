@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Menu, X, User, Settings, LogOut } from "lucide-react"
+import Image from 'next/image'
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -36,7 +37,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <span className="text-xl font-bold text-blue-600">TrustIt AI</span>
+            <Image src="/icon.png" width="32" height="32"  alt="TrustIt AI Logo" className="h-8 mr-2" />  
+            <span className="text-2xl font-bold text-purple-500 bg-200%">TrustIt AI</span> 
           </Link>
 
           {/* Desktop Navigation */}
@@ -46,7 +48,7 @@ export default function Navbar() {
                 key={item.name}
                 href={item.href}
                 className={`text-sm font-medium transition-colors ${
-                  isActive(item.href) ? "text-blue-600" : "text-gray-600 hover:text-blue-600"
+                  isActive(item.href) ? "text-purple-500" : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 {item.name}

@@ -6,7 +6,7 @@ import AgentsExplanation from "@/components/home/agents-explanation"
 
 export const metadata: Metadata = {
   title: "TrustIt AI - Detect Misinformation with AI",
-  description: "Upload text or images to analyze for potential misinformation using our AI-powered agents",
+  description: "Upload text or images to analyse for potential misinformation using our AI-powered agents",
 }
 
 export default function Home() {

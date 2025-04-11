@@ -2,12 +2,12 @@ export default function HowItWorks() {
   const steps = [
     {
       title: "Input Content",
-      description: "Paste text or upload an image that you want to analyze for potential misinformation.",
+      description: "Paste text or upload an image that you want to analyse for potential misinformation.",
     },
     {
       title: "AI Analysis",
       description:
-        "Our specialized AI agents analyze the content from multiple perspectives, checking facts, sources, and emotional manipulation.",
+        "Our specialised AI agents analyse the content from multiple perspectives, checking facts, sources, and emotional manipulation.",
     },
     {
       title: "Detailed Results",

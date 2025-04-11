@@ -91,7 +91,7 @@ export default function DashboardPage() {
                 <Card key={analysis.id}>
                   <CardHeader>
                     <CardTitle className="truncate">{analysis.content.substring(0, 50)}...</CardTitle>
-                    <CardDescription>Analyzed {formatDate(analysis.created_at)}</CardDescription>
+                    <CardDescription>Analysed {formatDate(analysis.created_at)}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-gray-600 mb-4 line-clamp-2">{analysis.content}</p>
@@ -133,7 +133,7 @@ export default function DashboardPage() {
                 <Card key={analysis.id}>
                   <CardHeader>
                     <CardTitle className="truncate">{analysis.content.substring(0, 50)}...</CardTitle>
-                    <CardDescription>Analyzed {formatDate(analysis.created_at)}</CardDescription>
+                    <CardDescription>Analysed {formatDate(analysis.created_at)}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-gray-600 mb-4 line-clamp-2">{analysis.content}</p>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
             <div className="text-center py-12">
               <p className="text-gray-500">You haven't saved any analyses yet.</p>
               <Button className="mt-4" onClick={() => router.push("/")}>
-                Analyze New Content
+                Analyse New Content
               </Button>
             </div>
           )}

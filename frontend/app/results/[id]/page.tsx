@@ -119,7 +119,7 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
             <CardContent className="py-12 text-center">
               <p className="text-gray-600">Analysis result not found or has been deleted.</p>
               <Button className="mt-4" onClick={() => router.push("/")}>
-                Analyze New Content
+                Analyse New Content
               </Button>
             </CardContent>
           </Card>
@@ -149,7 +149,7 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Content Analyzed</CardTitle>
+            <CardTitle>Content Analysed</CardTitle>
             <CardDescription>The text that was submitted for analysis</CardDescription>
           </CardHeader>
           <CardContent>

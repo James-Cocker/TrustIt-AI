@@ -5,7 +5,7 @@ export default function AgentsExplanation() {
     {
       name: "Linguistic Feature Analysis Agent",
       description:
-        "Analyzes the linguistic properties of content, examining emotional tone, writing style, and other features that might indicate misinformation.",
+        "Analyses the linguistic properties of content, examining emotional tone, writing style, and other features that might indicate misinformation.",
     },
     {
       name: "Fact-Checking Agent",
@@ -14,7 +14,7 @@ export default function AgentsExplanation() {
     },
     {
       name: "Sentiment Analysis Agent",
-      description: "Detects emotional manipulation by analyzing the sentiment and emotional triggers in the content.",
+      description: "Detects emotional manipulation by analysing the sentiment and emotional triggers in the content.",
     },
     {
       name: "Judge Agent",
@@ -26,7 +26,7 @@ export default function AgentsExplanation() {
     <section className="py-16">
       <h2 className="text-3xl font-bold text-center mb-4">Our AI Agents</h2>
       <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
-        TrustIt AI uses a multi-agent system to analyze content from different perspectives, providing a comprehensive
+        TrustIt AI uses a multi-agent system to analyse content from different perspectives, providing a comprehensive
         assessment of potential misinformation.
       </p>
 

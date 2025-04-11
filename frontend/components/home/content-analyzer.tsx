@@ -10,6 +10,7 @@ import { Upload, FileText } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/hooks/use-auth"
 import ImageUploader from "@/components/analyzers/image-uploader"
+import Link from 'next/link'
 
 export default function ContentAnalyzer() {
   const [text, setText] = useState("")
@@ -21,19 +22,33 @@ export default function ContentAnalyzer() {
 
   const handleAnalyzeText = async () => {
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to analyze content",
-        variant: "destructive",
-      })
-      router.push("/login")
-      return
+      return (
+        <section id="analyzer" className="py-16">
+          <h2 className="text-3xl font-bold text-center mb-8">Analyze Content</h2>
+          <Card className="max-w-3xl mx-auto text-center py-8">
+            <CardHeader>
+              <CardTitle>Authentication Required</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-6">Please sign in to analyze content for misinformation.</p>
+              <div className="flex justify-center gap-4">
+                <Button asChild>
+                  <Link href="/login">Sign In</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/signup">Create Account</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      )
     }
-
+    
     if (!text.trim()) {
       toast({
         title: "Empty content",
-        description: "Please enter some text to analyze",
+        description: "Please enter some text to analyse",
         variant: "destructive",
       })
       return
@@ -79,9 +94,7 @@ export default function ContentAnalyzer() {
   }
 
   return (
-    <section id="analyzer" className="py-16">
-      <h2 className="text-3xl font-bold text-center mb-8">Analyze Content</h2>
-
+    <section id="analyzer">
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
           <CardTitle>Check for Misinformation</CardTitle>
@@ -101,7 +114,7 @@ export default function ContentAnalyzer() {
 
             <TabsContent value="text">
               <Textarea
-                placeholder="Paste or type the text you want to analyze..."
+                placeholder="Paste or type the text you want to analyse..."
                 className="min-h-[200px]"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -121,7 +134,7 @@ export default function ContentAnalyzer() {
               disabled={isAnalyzing || !text.trim()}
               className="w-full"
             >
-              {isAnalyzing ? "Analyzing..." : "Analyze"}
+              {isAnalyzing ? "Analysing..." : "Analyse"}
             </Button>
           </CardFooter>
         )}
