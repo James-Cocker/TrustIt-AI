@@ -1,14 +1,19 @@
 """
-Main entry point for the Portia search application.
-Initializes the environment, loads configuration, and runs the search service.
+Command-line interface for the Portia search application.
 """
-
+import argparse
 from backend.utils import setup_environment
 from backend.config import load_config
 from backend.services import PortiaSearchService
 
-def main():
-    """Main function to run the application"""
+def cli():
+    """Run the command-line interface for the search application"""
+    parser = argparse.ArgumentParser(description="Search the web using Portia and Tavily")
+    parser.add_argument("query", nargs="?", default="who is uk prime minister?", 
+                        help="The search query to run (default: who is uk prime minister?)")
+    
+    args = parser.parse_args()
+    
     # Setup environment and configuration
     setup_environment()
     
@@ -19,9 +24,8 @@ def main():
         # Initialize search service
         search_service = PortiaSearchService(config)
         
-        # Run a test search
-        search_query = "who is uk prime minister?"
-        final_answer = search_service.search(search_query)
+        # Run the search with the provided query
+        final_answer = search_service.search(args.query)
         
         # Display results
         print("\n" + "="*40)
@@ -41,4 +45,4 @@ def main():
         print("   - GOOGLE_API_KEY for Gemini LLM")
 
 if __name__ == "__main__":
-    main() 
+    cli() 
