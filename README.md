@@ -51,6 +51,12 @@ This application integrates Portia's agent capabilities with Tavily's search API
 
 ## Usage
 
+The application now follows a two-step process:
+
+1.  **Question Generation:** Takes your initial query and uses Google Gemini to generate several specific sub-questions.
+2.  **Iterative Search:** Uses Portia and the Tavily Search tool to search the web for answers to each generated sub-question.
+3.  **Aggregation:** Combines the results from all sub-searches into a final output.
+
 ### Command Line Interface
 
 Run a search query from the command line:
