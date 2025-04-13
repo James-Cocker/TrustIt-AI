@@ -1,0 +1,6 @@
+wheel @ file:///opt/homebrew/Cellar/python%403.13/3.13.3/libexec/wheel-0.45.1-py3-none-any.whl#sha256=c00982b077e92504359d52a0482365099ab8c23f26817848cf77c784f6af247c
+fastapi>=0.100.0
+uvicorn>=0.22.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0
