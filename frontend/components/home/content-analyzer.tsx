@@ -88,7 +88,8 @@ export default function ContentAnalyzer() {
       }));
       
       console.log("Navigating to results page");
-      router.push(`/results/${result.analysisId}`);
+      // Always navigate to the static placeholder page instead of dynamic ID
+      router.push('/results/placeholder');
     } catch (error) {
       console.error("API error details:", error);
       toast({
