@@ -22,7 +22,8 @@ export default function ContentAnalyzer() {
   const { user } = useAuth()
 
   const handleAnalyzeText = async () => {
-    if (!user) {
+    // Temporarily comment out authentication check for testing
+    /*if (!user) {
       return (
         <section id="analyzer" className="py-16">
           <h2 className="text-3xl font-bold text-center mb-8">Analyze Content</h2>
@@ -44,7 +45,7 @@ export default function ContentAnalyzer() {
           </Card>
         </section>
       )
-    }
+    }*/
     
     if (!text.trim()) {
       toast({
@@ -58,6 +59,8 @@ export default function ContentAnalyzer() {
     setIsAnalyzing(true)
 
     try {
+      console.log("Making API request to:", `${API_BASE_URL}/api/analyze`);
+      
       // Make the API call to your Render backend
       const response = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: "POST",
@@ -65,11 +68,16 @@ export default function ContentAnalyzer() {
         body: JSON.stringify({ content: text, type: "text" }),
       })
 
+      console.log("Response status:", response.status);
+      
       if (!response.ok) {
-        throw new Error("Analysis request failed")
+        const errorText = await response.text();
+        console.error("API response error:", errorText);
+        throw new Error(`Analysis request failed: ${response.status} ${errorText}`);
       }
 
-      const result = await response.json()
+      const result = await response.json();
+      console.log("Received result:", result);
       
       // Store the result in localStorage for the results page to access
       localStorage.setItem('lastAnalysis', JSON.stringify({
@@ -77,16 +85,17 @@ export default function ContentAnalyzer() {
         result: result.result,
         judgment: "COMPLETED",
         overallScore: 75 // Default score until your backend provides real scores
-      }))
+      }));
       
-      router.push(`/results/${result.analysisId}`)
+      console.log("Navigating to results page");
+      router.push(`/results/${result.analysisId}`);
     } catch (error) {
-      console.error("API error:", error)
+      console.error("API error details:", error);
       toast({
         title: "Analysis failed",
         description: "There was an error analyzing your content. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
       setIsAnalyzing(false)
     }
