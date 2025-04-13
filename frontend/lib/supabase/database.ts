@@ -23,6 +23,31 @@ export async function saveAnalysisResult(userId: string, content: string, result
   }
 }
 
+// Update an existing analysis result
+export async function updateAnalysisResult(analysisId: string, result: any) {
+  try {
+    console.log("Updating analysis:", analysisId, "with result:", result)
+    
+    const { data, error } = await supabase
+      .from("analyses")
+      .update({
+        result,
+        // Update these top-level fields for easier dashboard filtering
+        judgment: result.judgment || null,
+        status: result.status || "completed",
+      })
+      .eq("id", analysisId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data.id
+  } catch (error) {
+    console.error("Error updating analysis:", error)
+    throw error
+  }
+}
+
 // Get user's analysis history
 export async function getUserAnalyses(userId: string) {
   try {

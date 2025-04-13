@@ -25,7 +25,7 @@ import { processContent } from "@/lib/api"
 import Pusher from 'pusher-js'
 import React from 'react'
 import { useAuth } from "@/hooks/use-auth"
-import { saveAnalysisResult } from "@/lib/supabase/database"
+import { saveAnalysisResult, updateAnalysisResult } from "@/lib/supabase/database"
 // Removed framer-motion imports that were causing issues
 
 // Keep the same interfaces from your original code
@@ -226,41 +226,30 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
         // Save result to localStorage
         localStorage.setItem('lastAnalysis', JSON.stringify(data.result));
         
-        // If user is logged in, save the result to the database
-        if (user && originalQuery) {
+        // If user is logged in, update the result in the database
+        if (user && id) {
           try {
-            // Get the judgment from the result
-            let judgment = data.result.judgment?.toUpperCase() || 'UNCERTAIN';
-            
-            // Ensure judgment is one of our expected values
-            if (!['REAL', 'FAKE', 'MISLEADING', 'UNCERTAIN'].includes(judgment)) {
-              // Map any unexpected values to our standard judgments
-              if (judgment.includes('REAL') || judgment.includes('TRUE') || judgment.includes('VERIFIED')) {
-                judgment = 'REAL';
-              } else if (judgment.includes('FAKE') || judgment.includes('FALSE')) {
-                judgment = 'FAKE';
-              } else if (judgment.includes('MISLEADING') || judgment.includes('PARTIALLY')) {
-                judgment = 'MISLEADING';
-              } else {
-                judgment = 'UNCERTAIN';
-              }
-            }
+            // Get the judgment value
+            const judgmentValue = data.result.judgment || 'UNCERTAIN';
             
             // Convert to expected format for database
             const formattedResult = {
-              ...data.result,
-              judgment: judgment, // Use our sanitized judgment value
-              overallScore: data.result.metadata?.confidence_scores?.judge * 100 || 50, // Scale to 0-100
-              status: "completed"
+              judgment: judgmentValue, // Store at top level
+              judgmentReason: data.result.judgment_reason || '',
+              initialQuestions: data.result.initial_questions || [],
+              factChecks: data.result.fact_checks || [],
+              metadata: data.result.metadata || {},
+              status: "completed",
+              overallScore: data.result.metadata?.confidence_scores?.judge * 100 || 50 // Scale to 0-100
             };
             
-            // Save to database with the current ID
-            saveAnalysisResult(user.id, originalQuery, formattedResult)
+            // Update existing record in database
+            updateAnalysisResult(id, formattedResult)
               .then(savedId => {
-                console.log('Analysis saved to database:', savedId);
+                console.log('Analysis updated in database:', savedId);
               })
               .catch(err => {
-                console.error('Failed to save analysis to database:', err);
+                console.error('Failed to update analysis in database:', err);
               });
           } catch (error) {
             console.error('Error preparing analysis for database:', error);

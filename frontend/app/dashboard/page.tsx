@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { getUserAnalyses } from "@/lib/supabase/database"
+import { RefreshCw } from "lucide-react"
 
 interface Analysis {
   id: string
@@ -21,6 +22,7 @@ export default function DashboardPage() {
   const [analyses, setAnalyses] = useState<Analysis[]>([])
   const [savedAnalyses, setSavedAnalyses] = useState<Analysis[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
   const router = useRouter()
 
   useEffect(() => {
@@ -33,7 +35,9 @@ export default function DashboardPage() {
       if (!user) return
 
       try {
+        setIsLoading(true)
         const data = await getUserAnalyses(user.id)
+        console.log("Fetched analyses:", data)
         setAnalyses(data)
         setSavedAnalyses(data.filter((analysis: Analysis) => analysis.saved))
       } catch (error) {
@@ -46,7 +50,11 @@ export default function DashboardPage() {
     if (user) {
       fetchAnalyses()
     }
-  }, [user, loading, router])
+  }, [user, loading, router, refreshTrigger])
+
+  const handleRefresh = () => {
+    setRefreshTrigger(prev => prev + 1)
+  }
 
   if (loading || !user) {
     return (
@@ -64,21 +72,42 @@ export default function DashboardPage() {
     }).format(date)
   }
 
-  const getJudgmentInfo = (result: any) => {
-    // Get the judgment from result if available
-    let judgment = result?.judgment?.toUpperCase() || "UNCERTAIN";
+  const getJudgmentInfo = (analysis: any) => {
+    console.log("Getting judgment for analysis:", analysis)
     
-    // Handle legacy data that might have risk levels
-    if (judgment === "HIGH RISK" || judgment === "MEDIUM RISK" || judgment === "LOW RISK" || judgment === "PROCESSING") {
-      // Convert risk levels to appropriate judgment values
-      if (judgment === "HIGH RISK") judgment = "FAKE";
-      else if (judgment === "MEDIUM RISK") judgment = "MISLEADING";
-      else if (judgment === "LOW RISK") judgment = "REAL";
-      else if (judgment === "PROCESSING") judgment = "UNCERTAIN";
+    if (!analysis) {
+      return { level: "UNCERTAIN", color: "bg-gray-500" }
     }
     
-    // Get appropriate color based on judgment
-    let color = "bg-gray-500" // Default color
+    if (analysis.status === "processing" || analysis.result?.status === "processing") {
+      return { level: "PROCESSING", color: "bg-blue-500" };
+    }
+    
+    let judgment = analysis?.judgment?.toUpperCase();
+    
+    if (!judgment && analysis?.result) {
+      judgment = analysis.result?.judgment?.toUpperCase() ||
+                analysis.result?.judgment_reason?.toUpperCase() ||
+                "UNCERTAIN";
+    }
+    
+    judgment = judgment || "UNCERTAIN";
+    
+    if (judgment === "PROCESSING") {
+      return { level: "PROCESSING", color: "bg-blue-500" };
+    }
+    
+    if (judgment.includes("REAL") || judgment.includes("TRUE") || judgment.includes("VERIFIED")) {
+      judgment = "REAL";
+    } else if (judgment.includes("FAKE") || judgment.includes("FALSE")) {
+      judgment = "FAKE";
+    } else if (judgment.includes("MISLEAD")) {
+      judgment = "MISLEADING";
+    } else if (judgment !== "UNCERTAIN") {
+      judgment = "UNCERTAIN";
+    }
+    
+    let color = "bg-gray-500"
     
     switch (judgment) {
       case "REAL":
@@ -101,7 +130,19 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Dashboard</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <Button 
+          variant="outline"
+          size="sm"
+          onClick={handleRefresh}
+          disabled={isLoading}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
 
       <Tabs defaultValue="recent">
         <TabsList className="mb-6">
@@ -116,7 +157,9 @@ export default function DashboardPage() {
             </div>
           ) : analyses.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {analyses.map((analysis) => (
+              {analyses.map((analysis) => {
+                const judgmentInfo = getJudgmentInfo(analysis);
+                return (
                 <Card key={analysis.id}>
                   <CardHeader>
                     <CardTitle className="truncate">{analysis.content.substring(0, 50)}...</CardTitle>
@@ -126,12 +169,7 @@ export default function DashboardPage() {
                     <p className="text-sm text-gray-600 mb-4 line-clamp-2">{analysis.content}</p>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <span
-                          className={`inline-block w-3 h-3 rounded-full ${
-                            getJudgmentInfo(analysis.result).color
-                          } mr-2`}
-                        ></span>
-                        <span className="text-sm font-medium">{getJudgmentInfo(analysis.result).level}</span>
+
                       </div>
                       <Button variant="outline" size="sm" onClick={() => router.push(`/results/${analysis.id}`)}>
                         View Details
@@ -139,7 +177,7 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              )})}
             </div>
           ) : (
             <div className="text-center py-12">
@@ -158,7 +196,9 @@ export default function DashboardPage() {
             </div>
           ) : savedAnalyses.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {savedAnalyses.map((analysis) => (
+              {savedAnalyses.map((analysis) => {
+                const judgmentInfo = getJudgmentInfo(analysis);
+                return (
                 <Card key={analysis.id}>
                   <CardHeader>
                     <CardTitle className="truncate">{analysis.content.substring(0, 50)}...</CardTitle>
@@ -170,10 +210,12 @@ export default function DashboardPage() {
                       <div className="flex items-center">
                         <span
                           className={`inline-block w-3 h-3 rounded-full ${
-                            getJudgmentInfo(analysis.result).color
-                          } mr-2`}
+                            judgmentInfo.color
+                          } mr-2 ${judgmentInfo.level === 'PROCESSING' ? 'animate-pulse' : ''}`}
                         ></span>
-                        <span className="text-sm font-medium">{getJudgmentInfo(analysis.result).level}</span>
+                        <span className="text-sm font-medium">
+                          {judgmentInfo.level === "PROCESSING" ? "PROCESSING..." : judgmentInfo.level}
+                        </span>
                       </div>
                       <Button variant="outline" size="sm" onClick={() => router.push(`/results/${analysis.id}`)}>
                         View Details
@@ -181,7 +223,7 @@ export default function DashboardPage() {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              )})}
             </div>
           ) : (
             <div className="text-center py-12">

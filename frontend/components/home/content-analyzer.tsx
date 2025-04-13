@@ -46,8 +46,11 @@ export default function ContentAnalyzer() {
           // Create a placeholder result with processing status
           const placeholderResult = {
             status: "processing",
-            judgment: "UNCERTAIN",
-            overallScore: 50, // Neutral score while processing
+            judgment: "PROCESSING",
+            initialQuestions: [],
+            factChecks: [],
+            metadata: {},
+            overallScore: 50 // Neutral score while processing
           }
           
           // Save to database
