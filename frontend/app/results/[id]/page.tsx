@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import { processContent } from "@/lib/api"
 import Pusher from 'pusher-js'
+import React from 'react'
 // Removed framer-motion imports that were causing issues
 
 // Keep the same interfaces from your original code
@@ -81,6 +82,8 @@ interface ProcessUpdate {
 }
 
 export default function ResultsPage({ params }: { params: { id: string } }) {
+  // Cast params to the correct type for React.use() and extract the id
+  const { id } = React.use(params as any) as { id: string };
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [loading, setLoading] = useState(true)
   const [originalQuery, setOriginalQuery] = useState<string>("")
@@ -178,10 +181,10 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
 
   // Setup Pusher subscription for this specific session
   useEffect(() => {
-    if (!params.id || !pusherRef.current) return;
+    if (!id || !pusherRef.current) return;
     
     // Subscribe to the channel for this specific fact-check session
-    const channel = pusherRef.current.subscribe(`fact-check-${params.id}`);
+    const channel = pusherRef.current.subscribe(`fact-check-${id}`);
     
     // Listen for all possible event types
     const eventTypes = [
@@ -243,9 +246,9 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
       eventTypes.forEach(eventType => {
         channel.unbind(eventType, handleUpdate);
       });
-      pusherRef.current.unsubscribe(`fact-check-${params.id}`);
+      pusherRef.current.unsubscribe(`fact-check-${id}`);
     };
-  }, [params.id]);
+  }, [id]);
 
   // This function processes the original query or follow-up questions
   const processUserQuery = async (query: string, queryId: string) => {
@@ -266,7 +269,7 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
       setCurrentStage('waiting');
       
       // Create a promise for the processing and store it in the cache
-      const processPromise = processContent(query, params.id).then(result => {
+      const processPromise = processContent(query, id).then(result => {
         if (result.error) {
           throw new Error(result.error);
         }
