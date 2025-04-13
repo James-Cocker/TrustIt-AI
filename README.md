@@ -157,10 +157,18 @@ The application follows a modular design with these key components:
 
 The application demonstrates how AI orchestration with Portia can be used to create more reliable and transparent information verification systems. Users can input any content they want to verify, and TrustIt-AI will provide a detailed analysis of its trustworthiness, complete with supporting evidence and sources.
 
-## Team
+## Website Images
 
-- [Team Member 1]
-- [Team Member 2]
-- [Team Member 3]
+![](images/Screenshot%202025-04-13%20093056.png)
+![](images/Screenshot%202025-04-13%20093105.png)
+![](images/Screenshot%202025-04-13%20093134.png)
+![](images/Screenshot%202025-04-13%20092622.png)
+![](images/Screenshot%202025-04-13%20092353.png)
+![](images/Screenshot%202025-04-13%20092442.png)
+![](images/Screenshot%202025-04-13%20092459.png)
+![](images/Screenshot%202025-04-13%20092515.png)
+![](images/Screenshot%202025-04-13%20092036.png)
+![](images/Screenshot%202025-04-13%20092052.png)
+![](images/Screenshot%202025-04-13%20102304.png)
 
 
