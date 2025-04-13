@@ -64,10 +64,39 @@ export default function DashboardPage() {
     }).format(date)
   }
 
-  const getRiskLevel = (score: number) => {
-    if (score >= 80) return { level: "High risk", color: "bg-red-500" }
-    if (score >= 50) return { level: "Medium risk", color: "bg-yellow-500" }
-    return { level: "Low risk", color: "bg-green-500" }
+  const getJudgmentInfo = (result: any) => {
+    // Get the judgment from result if available
+    let judgment = result?.judgment?.toUpperCase() || "UNCERTAIN";
+    
+    // Handle legacy data that might have risk levels
+    if (judgment === "HIGH RISK" || judgment === "MEDIUM RISK" || judgment === "LOW RISK" || judgment === "PROCESSING") {
+      // Convert risk levels to appropriate judgment values
+      if (judgment === "HIGH RISK") judgment = "FAKE";
+      else if (judgment === "MEDIUM RISK") judgment = "MISLEADING";
+      else if (judgment === "LOW RISK") judgment = "REAL";
+      else if (judgment === "PROCESSING") judgment = "UNCERTAIN";
+    }
+    
+    // Get appropriate color based on judgment
+    let color = "bg-gray-500" // Default color
+    
+    switch (judgment) {
+      case "REAL":
+        color = "bg-green-500"
+        break
+      case "FAKE":
+        color = "bg-red-500"
+        break
+      case "MISLEADING":
+        color = "bg-yellow-500"
+        break
+      case "UNCERTAIN":
+      default:
+        color = "bg-gray-500"
+        break
+    }
+    
+    return { level: judgment, color }
   }
 
   return (
@@ -99,10 +128,10 @@ export default function DashboardPage() {
                       <div className="flex items-center">
                         <span
                           className={`inline-block w-3 h-3 rounded-full ${
-                            getRiskLevel(analysis.result.overallScore).color
+                            getJudgmentInfo(analysis.result).color
                           } mr-2`}
                         ></span>
-                        <span className="text-sm font-medium">{getRiskLevel(analysis.result.overallScore).level}</span>
+                        <span className="text-sm font-medium">{getJudgmentInfo(analysis.result).level}</span>
                       </div>
                       <Button variant="outline" size="sm" onClick={() => router.push(`/results/${analysis.id}`)}>
                         View Details
@@ -141,10 +170,10 @@ export default function DashboardPage() {
                       <div className="flex items-center">
                         <span
                           className={`inline-block w-3 h-3 rounded-full ${
-                            getRiskLevel(analysis.result.overallScore).color
+                            getJudgmentInfo(analysis.result).color
                           } mr-2`}
                         ></span>
-                        <span className="text-sm font-medium">{getRiskLevel(analysis.result.overallScore).level}</span>
+                        <span className="text-sm font-medium">{getJudgmentInfo(analysis.result).level}</span>
                       </div>
                       <Button variant="outline" size="sm" onClick={() => router.push(`/results/${analysis.id}`)}>
                         View Details

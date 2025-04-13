@@ -46,6 +46,7 @@ export default function ContentAnalyzer() {
           // Create a placeholder result with processing status
           const placeholderResult = {
             status: "processing",
+            judgment: "UNCERTAIN",
             overallScore: 50, // Neutral score while processing
           }
           

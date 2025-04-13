@@ -229,9 +229,27 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
         // If user is logged in, save the result to the database
         if (user && originalQuery) {
           try {
+            // Get the judgment from the result
+            let judgment = data.result.judgment?.toUpperCase() || 'UNCERTAIN';
+            
+            // Ensure judgment is one of our expected values
+            if (!['REAL', 'FAKE', 'MISLEADING', 'UNCERTAIN'].includes(judgment)) {
+              // Map any unexpected values to our standard judgments
+              if (judgment.includes('REAL') || judgment.includes('TRUE') || judgment.includes('VERIFIED')) {
+                judgment = 'REAL';
+              } else if (judgment.includes('FAKE') || judgment.includes('FALSE')) {
+                judgment = 'FAKE';
+              } else if (judgment.includes('MISLEADING') || judgment.includes('PARTIALLY')) {
+                judgment = 'MISLEADING';
+              } else {
+                judgment = 'UNCERTAIN';
+              }
+            }
+            
             // Convert to expected format for database
             const formattedResult = {
               ...data.result,
+              judgment: judgment, // Use our sanitized judgment value
               overallScore: data.result.metadata?.confidence_scores?.judge * 100 || 50, // Scale to 0-100
               status: "completed"
             };
