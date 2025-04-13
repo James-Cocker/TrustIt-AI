@@ -3,22 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export default function AgentsExplanation() {
   const agents = [
     {
-      name: "Linguistic Feature Analysis Agent",
+      name: "Question Generator Agent",
       description:
-        "Analyses the linguistic properties of content, examining emotional tone, writing style, and other features that might indicate misinformation.",
+        "Analyzes content to identify factual claims and generates specific verification questions to determine the truthfulness of these claims.",
     },
     {
       name: "Fact-Checking Agent",
       description:
-        "Verifies the factual accuracy of claims by retrieving evidence from search engines and trusted knowledge bases.",
-    },
-    {
-      name: "Sentiment Analysis Agent",
-      description: "Detects emotional manipulation by analysing the sentiment and emotional triggers in the content.",
+        "Searches for evidence across multiple reliable sources using Tavily API, evaluates the credibility of information, and provides verification status with confidence scores.",
     },
     {
       name: "Judge Agent",
-      description: "Makes the final authenticity judgment based on the combined analysis from all other agents.",
+      description: "Makes the final authenticity judgment (REAL, MISLEADING, or FAKE) based on the fact-check results, weighing evidence quality and confidence levels.",
     },
   ]
 
@@ -26,11 +22,11 @@ export default function AgentsExplanation() {
     <section className="py-16">
       <h2 className="text-3xl font-bold text-center mb-4">Our AI Agents</h2>
       <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
-        TrustIt AI uses a multi-agent system to analyse content from different perspectives, providing a comprehensive
+        TrustIt-AI uses a multi-agent system powered by Portia to decompose complex fact-checking tasks, providing a comprehensive
         assessment of potential misinformation.
       </p>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
         {agents.map((agent, index) => (
           <Card key={index}>
             <CardHeader>
