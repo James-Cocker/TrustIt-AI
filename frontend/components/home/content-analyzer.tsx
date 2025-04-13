@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { FileText } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { useAuth } from "@/hooks/use-auth"
+import { saveAnalysisResult } from "@/lib/supabase/database"
 // Removed ImageUploader import
 
 export default function ContentAnalyzer() {
@@ -14,6 +16,7 @@ export default function ContentAnalyzer() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+  const { user } = useAuth()
 
   const handleAnalyzeText = async () => {
     if (!text.trim()) {
@@ -37,7 +40,35 @@ export default function ContentAnalyzer() {
       // Generate a simple ID based on timestamp
       const analysisId = Date.now().toString()
       
-      // Navigate to results page immediately
+      // If user is logged in, save to database (initial entry, result will be updated later)
+      if (user) {
+        try {
+          // Create a placeholder result with processing status
+          const placeholderResult = {
+            status: "processing",
+            overallScore: 50, // Neutral score while processing
+          }
+          
+          // Save to database
+          const dbAnalysisId = await saveAnalysisResult(
+            user.id,
+            text,
+            placeholderResult
+          )
+          
+          // Use the database ID if available
+          if (dbAnalysisId) {
+            // Navigate to results page with database ID
+            router.push(`/results/${dbAnalysisId}`)
+            return
+          }
+        } catch (error) {
+          console.error("Error saving to database:", error)
+          // Continue with localStorage approach as fallback
+        }
+      }
+      
+      // Navigate to results page immediately with timestamp ID
       router.push(`/results/${analysisId}`)
     } catch (error) {
       toast({

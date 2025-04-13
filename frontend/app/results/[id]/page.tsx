@@ -24,6 +24,8 @@ import {
 import { processContent } from "@/lib/api"
 import Pusher from 'pusher-js'
 import React from 'react'
+import { useAuth } from "@/hooks/use-auth"
+import { saveAnalysisResult } from "@/lib/supabase/database"
 // Removed framer-motion imports that were causing issues
 
 // Keep the same interfaces from your original code
@@ -106,6 +108,9 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
   const requestCacheRef = useRef<{[key: string]: Promise<any>}>({})
   
   const router = useRouter()
+
+  // Add user from auth context
+  const { user } = useAuth();
 
   // Initialize Pusher when the component mounts
   useEffect(() => {
@@ -217,6 +222,32 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
         setResult(data.result);
         setLoading(false);
         setProcessingQueryId(null);
+        
+        // Save result to localStorage
+        localStorage.setItem('lastAnalysis', JSON.stringify(data.result));
+        
+        // If user is logged in, save the result to the database
+        if (user && originalQuery) {
+          try {
+            // Convert to expected format for database
+            const formattedResult = {
+              ...data.result,
+              overallScore: data.result.metadata?.confidence_scores?.judge * 100 || 50, // Scale to 0-100
+              status: "completed"
+            };
+            
+            // Save to database with the current ID
+            saveAnalysisResult(user.id, originalQuery, formattedResult)
+              .then(savedId => {
+                console.log('Analysis saved to database:', savedId);
+              })
+              .catch(err => {
+                console.error('Failed to save analysis to database:', err);
+              });
+          } catch (error) {
+            console.error('Error preparing analysis for database:', error);
+          }
+        }
         
         // Add to conversation if not already there
         const queryId = "initial-query";
