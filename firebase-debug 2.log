@@ -1,0 +1,8 @@
+[debug] [2025-04-12T20:59:25.814Z] ----------------------------------------------------------------------
+[debug] [2025-04-12T20:59:25.817Z] Command:       /opt/homebrew/Cellar/node/23.6.1/bin/node /usr/local/bin/firebase deploy --only hosting:trust-ai-6b2c2
+[debug] [2025-04-12T20:59:25.817Z] CLI Version:   13.22.0
+[debug] [2025-04-12T20:59:25.817Z] Platform:      darwin
+[debug] [2025-04-12T20:59:25.817Z] Node Version:  v23.6.1
+[debug] [2025-04-12T20:59:25.817Z] Time:          Sat Apr 12 2025 21:59:25 GMT+0100 (British Summer Time)
+[debug] [2025-04-12T20:59:25.817Z] ----------------------------------------------------------------------
+[debug] 

@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "trust-ai-6b2c2",
+    "public": "frontend/out",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+} 

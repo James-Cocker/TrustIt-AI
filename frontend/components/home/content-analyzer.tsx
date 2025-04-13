@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/hooks/use-auth"
 import ImageUploader from "@/components/analyzers/image-uploader"
 import Link from 'next/link'
+import { API_BASE_URL } from "@/lib/api"
 
 export default function ContentAnalyzer() {
   const [text, setText] = useState("")
@@ -70,7 +71,7 @@ export default function ContentAnalyzer() {
 
       // Navigate to results page with the analysis ID
       // router.push(`/results/sample-analysis-id`)
-      const response = await fetch("https://your-fastapi-backend.com/api/analyze", {
+      const response = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: text, type: "text" }),
