@@ -58,19 +58,7 @@ export default function ContentAnalyzer() {
     setIsAnalyzing(true)
 
     try {
-      // In a real implementation, this would call your backend API
-      // const response = await fetch('/api/analyze', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ content: text, type: 'text' })
-      // })
-      // const result = await response.json()
-
-      // Simulate API call with timeout
-      // await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Navigate to results page with the analysis ID
-      // router.push(`/results/sample-analysis-id`)
+      // Make the API call to your Render backend
       const response = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -82,8 +70,18 @@ export default function ContentAnalyzer() {
       }
 
       const result = await response.json()
+      
+      // Store the result in localStorage for the results page to access
+      localStorage.setItem('lastAnalysis', JSON.stringify({
+        content: text,
+        result: result.result,
+        judgment: "COMPLETED",
+        overallScore: 75 // Default score until your backend provides real scores
+      }))
+      
       router.push(`/results/${result.analysisId}`)
     } catch (error) {
+      console.error("API error:", error)
       toast({
         title: "Analysis failed",
         description: "There was an error analyzing your content. Please try again.",
