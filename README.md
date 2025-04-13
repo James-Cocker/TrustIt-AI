@@ -1,17 +1,39 @@
-# TrustIt-AI Search Application
+# TrustIt-AI: Trustworthy Search Application
 
-A web search application using Portia and Tavily to provide reliable search results.
+![TrustIt-AI Architecture](images/architecture.png)
 
-## Overview
+## Project Description
 
-This application integrates Portia's agent capabilities with Tavily's search API to create a powerful and trustworthy search tool. The application is designed with modularity and maintainability in mind, following software engineering best practices.
+TrustIt-AI is an advanced search application that evaluates and verifies the truthfulness of information. In an era of rampant misinformation, TrustIt-AI helps users distinguish between reliable facts and misleading content by conducting thorough fact-checking on search queries.
+
+The application employs a multi-agent AI system powered by Portia to:
+1. Analyze search queries and identify factual claims
+2. Generate specific verification questions for each claim
+3. Search for evidence across multiple reliable sources
+4. Evaluate the credibility of found information
+5. Provide a final judgment on the trustworthiness of content (REAL, MISLEADING, or FAKE)
+
+## How Portia AI Was Used
+
+TrustIt-AI leverages Portia's powerful AI orchestration capabilities to create a sophisticated fact-checking pipeline:
+
+- **Multi-agent Planning**: Portia generates structured plans for decomposing complex fact-checking tasks into manageable steps
+- **Tool Integration**: We integrated Tavily search API as a tool within Portia's framework, allowing for evidence gathering from the web
+- **Execution Monitoring**: Portia's execution framework provides visibility into the LLM's reasoning process, creating more transparent fact-checking
+- **Stateful Workflows**: Portia maintains context throughout the verification journey, ensuring coherent analysis across multiple subtasks
+
+The application uses Portia to plan and execute the question generation phase, then conducts fact-checking using specialized agents, and finally renders judgment on content authenticity.
 
 ## Features
 
 - Web search using Tavily's search API
 - Agent-based search orchestration with Portia
-- Command-line interface for easy search queries
-- Modular codebase with separation of concerns
+- Real-time progress updates via Pusher
+- Verification status for claims (VERIFIED, FALSE, PARTIALLY TRUE, UNCERTAIN)
+- Confidence scoring for all judgments
+- Source credibility evaluation
+- Evidence presentation (supporting and contradicting)
+- Modern, responsive UI for result visualization
 
 ## Setup
 
@@ -42,6 +64,7 @@ This application integrates Portia's agent capabilities with Tavily's search API
    source backend/portia-env-py311/bin/activate
    # On Windows:
    portia-env-py311\Scripts\activate
+   ```
 
 4. Install dependencies
 
@@ -55,61 +78,6 @@ This application integrates Portia's agent capabilities with Tavily's search API
    PORTIA_API_KEY=your_portia_api_key
    TAVILY_API_KEY=your_tavily_api_key
    ```
-
-## Usage
-
-The application now follows a two-step process:
-
-1.  **Question Generation:** Takes your initial query and uses Google Gemini to generate several specific sub-questions.
-2.  **Iterative Search:** Uses Portia and the Tavily Search tool to search the web for answers to each generated sub-question.
-3.  **Aggregation:** Combines the results from all sub-searches into a final output.
-
-
-
-## Code Structure
-
-The application follows a modular design:
-
-- `backend/` - Main package
-  - `config.py` - Configuration loading and management
-  - `main.py` - Main entry point for the application
-  - `cli.py` - Command-line interface
-  - `tools/` - Tool implementations
-    - `tavily_search.py` - Tavily search tool implementation
-  - `services/` - Service classes
-    - `search_service.py` - Portia search service
-  - `utils/` - Utility functions
-    - `environment.py` - Environment setup utilities
-
-
-## TrustIt-AI Integration with Portia
-
-TrustIt-AI now integrates with [Portia](https://github.com/portiaAI/portia-sdk-python), an AI orchestration platform that provides:
-
-1. **Multi-agent planning** - Guides LLMs to produce structured plans for complex fact-checking
-2. **Stateful workflows** - Tracks progress through the fact-checking pipeline
-3. **Authenticated tool calling** - Seamlessly integrates with search and other tools
-
-The integration allows for a more robust fact-checking pipeline with better visibility into the LLM's reasoning process.
-
-### Using Portia Integration
-
-By default, the system now uses Portia for fact-checking. To switch between the original pipeline and Portia, modify the `use_portia` flag in `main.py`:
-
-```python
-# Choose which processing method to use
-use_portia = True  # Set to False to use the original pipeline
-```
-
-### Required API Keys
-
-To use the Portia integration, ensure you have the following API keys in your `.env` file:
-
-```
-GOOGLE_API_KEY=your_google_api_key
-PORTIA_API_KEY=your_portia_api_key  # If using Portia cloud services
-TAVILY_API_KEY=your_tavily_api_key  # For internet search
-```
 
 ## Running the Application
 
@@ -166,3 +134,33 @@ Once both backend and frontend are running:
 1. Open your browser and go to `http://localhost:3000`
 2. Enter your search query in the search bar
 3. View the trustworthiness analysis of the search results
+
+## Architecture
+
+The application follows a modular design with these key components:
+
+- `backend/` - Main package
+  - `server.py` - FastAPI server
+  - `portia_integration.py` - Integration with Portia AI
+  - `agents/` - Specialized agents for different tasks
+    - `question_generator_agent.py` - Generates verification questions
+    - `fact_checking_agent.py` - Verifies factual claims
+    - `judge_agent.py` - Makes final authenticity judgment
+  - `tools/` - Tool implementations
+    - `tavily_search.py` - Tavily search tool
+  
+- `frontend/` - Next.js web application
+  - Real-time updates via Pusher
+  - Modern UI with responsive design
+
+## Demo
+
+The application demonstrates how AI orchestration with Portia can be used to create more reliable and transparent information verification systems. Users can input any content they want to verify, and TrustIt-AI will provide a detailed analysis of its trustworthiness, complete with supporting evidence and sources.
+
+## Team
+
+- [Team Member 1]
+- [Team Member 2]
+- [Team Member 3]
+
+
