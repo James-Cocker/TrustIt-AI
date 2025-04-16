@@ -1,0 +1,28 @@
+
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: DOCKERFILE
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+    restart: unless-stopped
+    volumes:
+      - .:/trust_it
+    working_dir: /trust_it/backend
+    command: python -m run
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000
+    depends_on:
+      - backend
+    restart: unless-stopped 
