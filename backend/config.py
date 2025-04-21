@@ -16,9 +16,9 @@ def load_config():
     print(f"Loading environment variables from: {env_path}")
     
     # Check if keys are loaded
-    google_key = "AIzaSyArR-HO7OVdg4_j5y2dlcEQeg16J2LNL4Y"
-    portia_key = "prt-3YnXitdJ.LmR9PpEnsMorPYhMK1UyBNBdZe1OXAGr"
-    tavily_key = "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"
+    google_key = os.getenv("GOOGLE_API_KEY")
+    portia_key = os.getenv("PORTIA_API_KEY")
+    tavily_key = os.getenv("TAVILY_API_KEY")
     
     print(f"GOOGLE_API_KEY found: {'Yes' if google_key else 'No'}")
     print(f"PORTIA_API_KEY found: {'Yes' if portia_key else 'No'}")
