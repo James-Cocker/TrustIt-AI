@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/hooks/use-auth"
+import { useLegalModal } from "@/components/context/LegalModalContext"; // Import the custom hook
 
 export default function SignupPage() {
   const [email, setEmail] = useState("")
@@ -20,6 +21,7 @@ export default function SignupPage() {
   const { toast } = useToast()
   const router = useRouter()
   const { signUp } = useAuth()
+  const { openTermsModal, openPrivacyModal } = useLegalModal(); // Use the context
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -98,6 +100,24 @@ export default function SignupPage() {
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Sign up"}
             </Button>
+            <p className="text-center text-xs text-gray-500 dark:text-gray-400 px-4">
+              By signing up, you agree to our{" "}
+              <button
+                type="button"
+                onClick={openTermsModal}
+                className="underline hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
+              >
+                Terms and Conditions
+              </button>{" "}
+              and{" "}
+              <button
+                type="button"
+                onClick={openPrivacyModal}
+                className="underline hover:text-gray-700 dark:hover:text-gray-200 focus:outline-none"
+              >
+                Privacy Policy
+              </button>.
+            </p>
             <div className="text-center text-sm">
               Already have an account?{" "}
               <Link href="/login" className="text-blue-600 hover:underline">
